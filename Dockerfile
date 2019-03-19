@@ -9,7 +9,12 @@ RUN apt-get update \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN npm install -g selenium-side-runner
+RUN npm install --save -g \
+        selenium-side-runner@3.5.10 \
+        jest@>=23.0.0 \
+        jest-environment-node@^23.1.0 \
+        jest-environment-selenium@2.1.0 \
+        selenium-webdriver@4.0.0-alpha.1
 
 RUN mkdir /sides \
     && chown selenium: /sides
@@ -20,6 +25,6 @@ RUN mkdir /out \
 VOLUME ["/out"]
 
 COPY selenium-side-runner.sh /etc/service/selenium-side-runner/run
-COPY chmod +x /etc/service/selenium-side-runner/run
+RUN  chmod +x /etc/service/selenium-side-runner/run
 
 CMD ["/sbin/my_init"]
