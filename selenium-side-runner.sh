@@ -10,4 +10,7 @@ if [ ${#HUB_PORT} -lt 1 ]; then
         export HUB_PORT=$(cat /variables/HUB_PORT)
 fi
 
-exec /sbin/setuser selenium selenium-side-runner -s http://${HUB_ADDRESS}:${HUB_PORT} --output-directory /out /sides/*.side >> /var/log/selenium.log 2>&1
+cd /home/selenium
+exec /sbin/setuser selenium selenium-side-runner -s http://${HUB_ADDRESS}:${HUB_PORT} --output-directory /out /sides/*.side
+
+sleep 5m
