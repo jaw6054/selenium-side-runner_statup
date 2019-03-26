@@ -21,7 +21,7 @@ RUN  chmod +x /etc/service/selenium-side-runner/run
 
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends python-pip \
+    && apt-get install -y --no-install-recommends python-pip python-setuptools \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
