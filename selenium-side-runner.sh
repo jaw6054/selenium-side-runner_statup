@@ -11,6 +11,6 @@ if [ ${#HUB_PORT} -lt 1 ]; then
 fi
 
 cd /home/selenium
-exec /sbin/setuser selenium selenium-side-runner -s http://${HUB_ADDRESS}:${HUB_PORT} --output-directory /out /sides/*.side
+exec /sbin/setuser selenium selenium-side-runner -s http://${HUB_ADDRESS}:${HUB_PORT}/wd/hub --output-directory /out /sides/*.side
 
 sleep 5m
