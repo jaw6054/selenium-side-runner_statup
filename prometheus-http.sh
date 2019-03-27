@@ -23,7 +23,9 @@ class SeleniumCollector():
             'gauge'
         )
         dtm = datetime.utcfromtimestamp(content["startTime"]/1000)
-        startTime.add_sample('selenium_' + testSuite + '_startTime', value = content["startTime"]/1000, labels = {})
+        startTime.add_sample('selenium_' + testSuite + '_startTime', 
+                             value = content["startTime"]/1000, 
+                             labels = {})
         yield startTime
         #
         success = Metric(
@@ -31,7 +33,9 @@ class SeleniumCollector():
             'Selenium success status for suite ' + testSuite,
             'gauge'
         )
-        success.add_sample('selenium_' + testSuite + '_success', value = content["success"], labels = {})
+        success.add_sample('selenium_' + testSuite + '_success', 
+                           value = content["success"], 
+                           labels = {})
         yield success
         #
         numPassedTests = Metric(
@@ -42,15 +46,8 @@ class SeleniumCollector():
         numPassedTests.add_sample('selenium_' + testSuite + '_numPassedTests', value = content["numPassedTests"], labels = {})
         yield numPassedTests
         #
-        numFailedTests = Metric(
-            'selenium_' + testSuite + '_numFailedTests',
-            'Selenium number of failed tests for suite ' + testSuite,
-            'gauge'
-        )
-        numFailedTests.add_sample('selenium_' + testSuite + '_numFailedTests', value = content["numFailedTests"], labels = {})
-        yield numFailedTests
-        #
         greyOut = 0
+        waitOut = 0
         for test in content["testResults"][0]["assertionResults"]:
             title = test["title"]
             status = test["status"]
@@ -63,15 +60,37 @@ class SeleniumCollector():
             
             isGrey = bool(re.search("ss-gray-out", failureMessage))
             greyOut = greyOut + isGrey
+            isWait = bool(re.search("Wait timed out", failureMessage))
+            waitOut = waitOut + isWait
         #
         numGrayOuts = Metric(
             'selenium_' + testSuite + '_numGrayOuts',
             'Selenium number of grayed-out tests for suite ' + testSuite,
             'gauge'
         )
-        numGrayOuts.add_sample('selenium_' + testSuite + '_numGrayOuts', value = greyOut, labels = {})
+        numGrayOuts.add_sample('selenium_' + testSuite + '_numGrayOuts', 
+                               value = greyOut, 
+                               labels = {})
         yield numGrayOuts
-
+        #
+        numWaitOuts = Metric(
+            'selenium_' + testSuite + '_numWaitOuts',
+            'Selenium number of tests failing due to timeout ' + testSuite,
+            'gauge'
+        )
+        numWaitOuts.add_sample('selenium_' + testSuite + '_numWaitOuts', 
+                               value = waitOut, 
+                               labels = {})
+        yield numWaitOuts
+        #
+        numOtherFailedTests = Metric(
+            'selenium_' + testSuite + '_numOtherFailedTests',
+            'Selenium number of failed tests apart from grey-out and wait-out for suite ' + testSuite,
+            'gauge'
+        )
+        otherFailed = content["numFailedTests"] - waitOut - greyOut
+        numOtherFailedTests.add_sample('selenium_' + testSuite + '_numOtherFailedTests', value = otherFailed, labels = {})
+        yield numOtherFailedTests
         #
         # message = Metric(
         #     'selenium_' + testSuite + '_message',
@@ -88,5 +107,4 @@ if __name__ == '__main__':
     REGISTRY.register(SeleniumCollector())
     #
     while True: time.sleep(10)
-
 
